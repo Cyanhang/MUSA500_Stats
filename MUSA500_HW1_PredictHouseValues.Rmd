@@ -48,11 +48,11 @@ library(corrplot)
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
-data_geom <-st_read("C:/Users/hangzh/Downloads/Lecture 1 - RegressionData.shp/RegressionData.shp")
+data_geom <-st_read("/Users/hangzh/Downloads/Lecture 1 - RegressionData.shp/RegressionData.shp")
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
-palette5 <- c("#f0f9e8","#bae4bc","#7bccc4","#43a2ca","#0868ac")
+palette5 <- c("#AED6F1","#85C1E9","#3498DB","#2874A6","#1B4F72")
 
 ```
 
@@ -71,10 +71,10 @@ newqBr <- function(df, variable, rnd) {
 
 # **Introduction**
 
-Philadelphia, renowned for its rich history and pulsating present, is home to a continually evolving real estate environment. However, a study by the Economic League reveals a nuanced picture: the overall proportion of Philadelphia households grappling with housing cost burden experienced a decrease from 29.8% to 26.7% between 2016 and 2021. Nevertheless, this alteration in cost burden manifested divergently across various income brackets. Considering housing is a fundamental human necessity, ensuring affordability is crucial for maintaining well-being and quality of life. Consequently, comprehending the factors that influence housing values is essential for exerting better control over the housing market and making more strategic, informed decisions.
+Philadelphia, renowned for its rich history and pulsating present, is home to a continually evolving real estate environment. However, a study by the Economic League reveals a nuanced picture: the overall proportion of Philadelphia households grappling with housing cost burden experienced a decrease from 29.8% to 26.7% between 2016 and 2021(Economic League, 2023). Nevertheless, this alteration in cost burden manifested divergently across various income brackets. Considering housing is a fundamental human necessity, ensuring affordability is crucial for maintaining well-being and quality of life. Consequently, comprehending the factors that influence housing values is essential for exerting better control over the housing market and making more strategic, informed decisions.
 
 
-This report aims to explore the relationship between median house values and various neighborhood characteristics within the city of Philadelphia. It is widely understood that property values are influenced by both the conditions of the housing and the economic status of the property owners. By analyzing data at the Census block group level, we aim to comprehend the relationship between neighborhood characteristics （including the proportion of residents in Block Group with at least a bachelor’s degree, housing vacancy, percent of housing units that are detached single-family houses, median household income） and the median value of all owner-occupied housing units.
+This report aims to explore the relationship between median house values and various neighborhood characteristics within the city of Philadelphia. It is widely understood that property values are influenced by both the conditions of the housing and the economic status of the property owners. By analyzing data at the Census block group level, we aim to comprehend the relationship between median house value and several neighborhood characteristics, including the proportion of residents in the Block Group with at least a bachelor’s degree, housing vacancy, percentage of housing units that are detached single-family houses, and number of households living poverty.
 
 
 # **Methods**
@@ -147,16 +147,19 @@ Sample correlation coefficient R is a point estimator of the population correlat
 
 If we use the formula 1 – SSE/SST, we can get the coefficient of determination R2 which is the proportion of observed variation in the dependent variable y that was explained by the model, and always ranges between 0 and 1. 
 
+$$
+R^2 = 1-\frac{SSE}{SST}
+$$
+
 
 To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the coefficient β equals to zero, and alternative  hypothesis or Ha states that the coefficient β does not equal to zero, demonstrating as H0: β=0 and Ha: β≠0; 
 
 
 ## **Additional Analyses**
 
-Stepwise regression is a statistical method that allows us to understand the statistical relationship between independent and dependent variables. The process of stepwise regression screens candidate variables and automatically identifies influential variables. In this scenario, stepwise regression is used to examine the statistical relationship between the dependent variable (MEDHVAL) and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, and PCTSINGLES) based on the Akaike Information Criterion (a mathematical method for evaluating how well a model fits the data it was generated from). Specifically, the algorithm adds or removes predictors to see if there is a significant change in the model fit determined by the AIC value and retains all predictors resulting in substantial changes. However, there are limitations as well. Firstly, stepwise regression often leads to overfitting. To be more specific, sometimes the training data size is too small and needs more data samples to accurately represent all possible input data values, leading to poor generalization to new datasets. Furthermore, rather than relying on professional knowledge, the model relies on an automatic process of selecting predictive variables. Therefore, it may need to look into a more comprehensive model.
+To further test the relationship between median house values and studied neighborhood characteristics, we also run the stepwise regression. Stepwise regression is a statistical method that allows us to understand the statistical relationship between independent and dependent variables. The process of stepwise regression screens candidate variables and automatically identifies influential variables. In this scenario, stepwise regression is used to examine the statistical relationship between the dependent variable (MEDHVAL), and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, and PCTSINGLES) based on the Akaike Information Criterion (a mathematical method for evaluating how well a model fits the data it was generated from). Specifically, the algorithm adds or removes predictors to see if there is a significant change in the model fit determined by the AIC value and retains all predictors resulting in significant changes. The model with a smaller ACI is usually regarded as a better one. However, there are limitations as well. Firstly, stepwise regression often leads to overfitting. To be more specific, sometimes the dataset does not contain enough data samples to accurately represent all possible input data values, leading to poor generalization to new datasets. Furthermore, rather than relying on professional knowledge, the model relies on an automatic process of selecting predictive variables. Therefore, it may overlook a more comprehensive model.
 
-
-The K-fold cross-validation is a method used for evaluating the performance of the regression model. In this scenario(k=5), the sample dataset is randomly divided into five folds for training and validation. During each run, one-fold is selected for validation, and the rest are used for training and further iterations. This process is repeated five times, each with a different fold serving as the validation set and the other four as the training set. After this process, we will get five different performance values for each fold, the average of which serves as a holistic performance metric to determine how generalizable our model is. In this scenario, we will use the root mean squared error (RMSE) as the referencing performance value to evaluate the model’s performance. The RMSE measures the average magnitude of errors between the predicted and observed values in a dataset. In other words, it tells us the standard deviation of the residuals (prediction errors).
+To test the problem of overfitting, we implement the K-fold cross-validation, a method used for evaluating the model performance. To further explain this, in this scenario(k=5), the sample dataset is randomly divided into five folds for training and validation. During each run, one-fold is selected for validation, and the rest are used for training and further iterations. This process is repeated five times, each with a different fold serving as the validation set and the other four as the training set. After this process, we will get five different performance values for each fold, the average of which serves as a holistic performance metric to determine how generalizable our model is. In this scenario, we will use the root mean squared error (RMSE) as the referencing performance value to evaluate the model’s performance. The RMSE measures the average magnitude of errors between the predicted and observed values in a dataset. In other words, it tells us the standard deviation of the residuals (prediction errors). 
 
 Turning to the discussion of the formula of the RMSE calculation, firstly, we need to get the SSE. In the formula below,  Xi stands for the observed values, Xn stands for the corresponding predicted values. The SSE is calculated as: 
 
@@ -172,9 +175,10 @@ After taking the square root of the MSE, we get the value for RMSE:
 $$
 RMSE =\sqrt{\frac{\sum_{i = 1}^{n}{(x_i- x_n )^2}}{n}} 
 $$
+In this study, we initially conduct cross-validation on the regression model incorporating all four predictors. Subsequently, for comparative purposes, we also perform cross-validation on a model using only PCTBANT(housing vacancy) and MEDHHINC(median household income) as predictors.
 
 ## **Software**
-
+The software we used is R, a programming language with powerful statistical analysis capabilities.
 
 # **Results**
 
@@ -226,13 +230,18 @@ other independent variables: use original variables
 
 ```{r}
 # plot all the histograms
-hist(data$MEDHVAL, breaks = 50)
+hist(data$MEDHVAL, main="Histogram of Median House Value", xlab="MEDHVAL",breaks = 50)
 par(mfrow=c(2,2))
-hist(data$NBELPOV100, breaks = 50)
-hist(data$PCTBACHMOR, breaks = 50)
-hist(data$PCTVACANT, breaks = 50)
-hist(data$PCTSINGLES, breaks = 50)
+hist(data$NBELPOV100, main="Histogram of Number of Poverty", xlab="NBELPOV100", breaks = 50)
+hist(data$PCTBACHMOR, main="Histogram of % of Bachelor Degrees", xlab="PCTBACHMOR", breaks = 50)
+hist(data$PCTVACANT, main="Histogram of % of Vacant Houses", xlab="PCTVACANT", breaks = 50)
+hist(data$PCTSINGLES, main="Histogram of % of Single House Units", xlab="PCTSINGLES",breaks = 50)
 ```
+
+
+From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflation, which means that there are very high frequency of zero values in the histograms after log transformation. Keep that in mind, we will only use log Median House Value presented as LNMEDHVAL (dependent variable), and log Number of Household living in Poverty LNNBELPV100 (one predictor) for the following regression analysis, while keep the other three variables original. 
+
+Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following section 3.3 
 
 ```{r}
 # plot all the histograms for new log variables
@@ -244,18 +253,18 @@ hist(LNPCTVACANT, breaks = 50)
 hist(LNPCTSINGLES, breaks = 50)
 ```
 
-From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflation, which means that there are very high frequency of zero values in the histograms after log transformation. Keep that in mind, we will only use log Median House Value presented as LNMEDHVAL (dependent variable), and log Number of Household living in Poverty LNNBELPV100 (one predictor) for the following regression analysis, while keep the other three variables original. 
-
-Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following section 3.3 
-
 ### Choropleth maps
+
+Choropleth maps of each variable, LNMEDHVAL, LNNBELPOV, PCTVACANT, PCTSINGLES, and PCTBACHMOR are presented below. We used 5 quantile breaks as the map representation method. From the maps, we can see that there are clearly some overlaps between LNMEDHVAL map(Figure 1) and PCTBACHMOR map(Figure 5), showing strong correlation of the predictor % of Bachelor's Degree to the dependent variable Median House Value. Whereas the LNNBELPOV and PCTVACANT maps are having completely different patterns to the MEDHVAL map, illustrating very weak correlations. PCTSINGLES however, is presenting partially similar pattern to the MEDHVAL, which may have some extent of correlation to the dependent variable. 
+
+Among the predictors, there are no obvious similarities between the maps, while LNNBELPOV does show a little overlap with the PCTVACANT, we do not expect there to be severe multicollinearity between the predictors. 
 
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Median House Value
 Plot1 <-ggplot(data_geom) +
   geom_sf(aes(fill = q5(LNMEDHVAL)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "LNMEDHVAL"),
+                    #labels= newqBr(data_geom, "LNMEDHVAL"),
                     name = "LN Median House Value\n(Quintile Breaks)")+
   labs(title = "LN Median House Value in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -271,7 +280,7 @@ Plot1
 Plot2 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(LNNBELPOV)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "LNNBELPOV"),
+                    #labels= newqBr(data_geom, "LNNBELPOV"),
                     name = "LN Households in Poverty\n(Quintile Breaks)")+
   labs(title = "LN number of households living in poverty in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -285,7 +294,7 @@ Plot2 <- ggplot(data_geom) +
 Plot3<- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTVACANT)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "PCTVACANT"),
+                    #labels= newqBr(data_geom, "PCTVACANT"),
                     name = "Precentage of Vacant housing units(%)\n(Quintile Breaks)")+
   labs(title = "Proportion of housing units that are vacant in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -299,7 +308,7 @@ Plot3<- ggplot(data_geom) +
 Plot4 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTSINGLES)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "PCTSINGLES"),
+                    #labels= newqBr(data_geom, "PCTSINGLES"),
                     name = "Precentage of housing units:\ndetached single family houses(%)\n(Quintile Breaks)")+
   labs(title = "Percent of housing units that are detached single family houses in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -313,7 +322,7 @@ Plot4 <- ggplot(data_geom) +
 Plot5 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTBACHMOR)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "PCTBACHMOR"),
+                    #labels= newqBr(data_geom, "PCTBACHMOR"),
                     name = "Precentage of residents:\nwith at least a bachelor's degree(%)\n(Quintile Breaks)")+
   labs(title = "Proportion of residents in Block Group with at least a bachelor’s degree in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -335,6 +344,9 @@ mapgrid
 
 
 ### Correlation Matrix
+
+Correlation matrix in graph and table is shown below. It is used to test multicollinearity between the predictors. Looking at the table, we can see that the greatest correlation coefficients between predictors are -0.31, 0.24, and -0.29, which are not strongly correlated. Therefore, no severe multicollinearity between the predictors has been observed, which aligns the expectations from previous map observations. 
+
 ```{r}
 # correlation matrix
 data_cor <- data_geom %>%
@@ -342,7 +354,6 @@ data_cor <- data_geom %>%
   st_drop_geometry()
 
 cor_matrix <- cor(data_cor, method=c("pearson"))
-cor_matrix
 corrplot(cor_matrix)
 ```
 
@@ -407,20 +418,21 @@ As we can see from the scatter plots, none of the relationships between the depe
 
 ```{r}
 # create a plotting window with 2*2 array
-par(mfrow=c(2,2))
-plot(data_cor$LNNBELPOV, data_cor$LNMEDHVAL)
-plot(data_cor$PCTBACHMOR, data_cor$LNMEDHVAL)
-plot(data_cor$PCTVACANT, data_cor$LNMEDHVAL)
-plot(data_cor$PCTSINGLES, data_cor$LNMEDHVAL)
+# par(mfrow=c(2,2))
+scatter1 <- ggplot(data_cor, aes(x=LNNBELPOV, y=LNMEDHVAL)) + geom_point()
+scatter2 <- ggplot(data_cor, aes(x=PCTBACHMOR, y=LNMEDHVAL)) + geom_point()
+scatter3 <- ggplot(data_cor, aes(x=PCTVACANT, y=LNMEDHVAL)) + geom_point()
+scatter4 <- ggplot(data_cor, aes(x=PCTSINGLES, y=LNMEDHVAL)) + geom_point()
+plot_grid(scatter1,scatter2,scatter3,scatter4)
 ```
 
 
-### Normality of residuals:
+### Normality of residuals
 Normality of residuals is important for point estimation, confidence intervals, and hypothesis tests only for small samples due to the central limit theorem. In our model, the number of observations reaches more than 1,400. Meanwhile, it's easy to notice from the histogram that most of the residuals are clustered around 0 and the trend seems to be normal.
 ```{r}
 #Residuals (and histogram of residuals)
 data_cor$resids <- residuals(lm1)
-hist(data_cor$resids)
+hist(data_cor$resids, main="Histogram of the standardized residuals", xlab="standardized Residuals", breaks = 20)
 ```
 
 
@@ -445,7 +457,8 @@ standardized <- rstandard(lm1)
 
 ```{r}
 # plot the standardized residuals versus predicted values scatter graph
-plot(fit, standardized)
+residual_predicted <- data.frame(x = fit, y = standardized)
+ggplot(residual_predicted, aes(x=fit, y=standardized)) + geom_point() + xlab("Predicted Values") + ylab("Standardized Residuals")
 ```
 
 
@@ -489,7 +502,9 @@ choro_stdreg
 
 ## **Additional Models**
 
-3. using stepwise regression and determine best model
+### using stepwise regression and determine the best model
+As is depicted in the result of the stepwise model, all 4 predictors in the original model are retained in the final model. To be more specific, compared with other models with some of the variables dropped, the original has the smallest AIC, -3448.16, indicating that the original model does the best prediction. 
+
 ```{r}
 best_model <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, data=data_cor)
 step <- stepAIC(best_model, direction="both")
@@ -497,49 +512,66 @@ step <- stepAIC(best_model, direction="both")
 step$anova
 ```
 
-K-fold model
-
+### K-fold model
+After performing cross-validation on the models, we obtained the following results: the RMSE for the original regression model stands at 0.366, while the secondary model has an RMSE of 0.443.
 ```{r include=FALSE}
 #Original model,set.seed(125)
 fit1 <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV, data=data_cor)
 summary(fit1)
-cv <- CVlm(data = data_cor, fit1, m=5)
-mse <- attr(cv, "ms")
-rmse <- sqrt(mse)			#Obtaining RMSE for model 1
-rmse
+cv1 <- CVlm(data = data_cor, fit1, m=5)
+mse1 <- attr(cv1, "ms")
+rmse1 <- sqrt(mse1)			#Obtaining RMSE for model 1
 ```
+
+```{r}
+rmse1
+```
+
 
 ```{r include=FALSE}
 #model2
 fit2 <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=data_geom)
 summary(fit2)
-cv <- CVlm(data=st_drop_geometry(data_geom), fit2, m=5)
-mse <- attr(cv, "ms")
-rmse <- sqrt(mse)				#Obtaining RMSE for model 2
-rmse
+cv2 <- CVlm(data=st_drop_geometry(data_geom), fit2, m=5)
+mse2 <- attr(cv2, "ms")
+rmse2 <- sqrt(mse2)				#Obtaining RMSE for model 2
 ```
 
+```{r}
+rmse2
+```
+
+
 # **Discussion and Limitations**
-## Recap - Hang
-Recap what you did in the paper and your findings. Discuss what conclusions you can draw, which variables were significant and whether that was surprising or not.
+## Conclusion
 
-## Model Quality - Jiahang
-The results from the three referenced models consistently indicate that they are high-quality models overall. After assessing the regression model, the output (the F-statistic is high, and the P-value is way much smaller than 0.05) suggests the strength of the regression model. To be more specific, the high F-statistic means that we can reject the null hypothesis that none of the independent variables in the model is a significant predictor of the dependent variable. Also, the multiple R-square (0.6623) indicates that approximately 66.23% of the variance in median house values can be explained by the model. 
+In summary, we examined the relationship between median house values and several neighborhood characteristics using Philadelphia data at the Census block group level. More specifically, linear regression was done between the dependent variable MEDHVAL (Median House Values) and the predictors PCTBACHMOR (Percentage of Bachelor's Degree or Higher), NBELPOV100 (Number of Households living in Poverty), PCTVACANT (Percentage of Vacant Houses), and PCTSINGLES (Percentage of Single House Units). Due to the fact that all variables are positively skewed, we applied log transformation to each variable, and decided to use log MEDHVAL, and log NBELPOV100 in our model, because although all variables are normalized after log transformation, the other three variables are all having zero inflations, while NBELPOV100 and MEDHVAL do not have/have negligible frequency of zero values. 
 
-Also, in the stepwise regression results, all 4 predictors in the original model are retained in the final model, which means that the original model is the best model. That is to say, all variables have a statistically strong relationship with the dependent variables. 
+After that, regression assumptions were checked: multicollinearity, linear relationship between dependent variables and predictors, homoscedasticity of variance of residuals, and normality of residuals, where all the assumption requirements are successfully met in this model. The result of linear regression presented that all four predictors are significant with p values far less than 0.05, which means that the null hypothesis of the beta coefficient equals to zero can be rejected, and all four predictors are significantly correlated with the dependent variable LNMEDHVAL. Within those, predictor PCTBACHMOR (percentage of residents with at least a Bachelor's degree) demonstrates the most significant association to the LNMEDHVAL. 
 
-Moreover, based on the output of the cross-validation model, the original model, which considers all four variables, has a lower RMSE, 0.366 compared to the model solely relying on 'housing vacancy' and 'median household income' as predictors, which yields an RMSE of 0.443. This underscores the superiority of the original model.
+Finally we applied stepwise regression and k-fold cross-validation to further validate our result. Overall, all four predictors are kept in the stepwise regression, and the rmse value (root mean squared error) in our model is obviously lower than the rmse value in the model that only has PCTVACANT and MEDHHINC (Median household income) as predictors. Therefore, it validates that our model performs better. 
 
 
-The output from the models all suggests that there is a strong relationship between median household value and residents’ educational level, housing vacancy, percent of housing units that are detached single-family houses, and median household income. To elaborate further, housing vacancy rates and the percentage of detached single-family houses serve as indicators of housing quality and pricing dynamics. Simultaneously, household income and residents' education levels are closely tied to economic status and the purchasing capacity of prospective homeowners. However, there is potential to enhance the model's comprehensiveness by introducing additional variables. For instance, the age of the housing stock exerts a profound influence on housing prices, and the number of bedrooms within a property can also significantly impact its market value. These considerations underscore the opportunity for enriching the model with a more comprehensive set of predictors.
+## Model Quality
+The conducted analysis indicates that the regression model is a good one overall. Firstly, based on the regression results, the high F-statistic means that we can reject the null hypothesis that none of the independent variables in the model is a significant predictor of the dependent variable. Also, the multiple R-square (0.6623) indicates that approximately 66.23% of the variance in median house values can be explained by the model. The result of the stepwise regression further supports the strength of the model. Specifically, all predictors in the original model are retained in the final model, which means that the original model is the best model. All predictors have a statistically strong relationship with the dependent variable. Moreover, a cross-validation comparison reveals the original model's superiority. When considering all four variables, the model achieves a lower RMSE of 0.366, while a model based solely on 'housing vacancy' and 'median household income' has a higher RMSE of 0.443. This lower RMSE implies that the comprehensive model offers better predictive accuracy and alignment with actual values.
+
+This analysis confirms a robust relationship between median household value and factors including residents’ educational level, housing vacancy, the proportion of detached single-family houses, and number of households living in poverty. Specifically, housing vacancy rates and the percentage of detached single-family homes can be seen as reflections of housing quality and price trends. Meanwhile, poverty and education levels provide insight into the economic standing and purchasing power of potential homeowners.
+
+While the current model is insightful, there is potential to enhance the model's comprehensiveness by introducing additional variables. For instance, the age of the housing stock exerts a profound influence on housing prices, and the number of bedrooms within a property can also significantly impact its market value. These considerations underscore the opportunity for enriching the model with a more comprehensive set of predictors.
 
 
-## Results - Ling
+
+## Limitations
 
 In terms of the model's limitations, it's important to note that the relationships between predictors and the dependent variable are not strictly linear. Only the relationship between PCTBACHMOR and MEDHVAL appears to be relatively linear. This violation of linearity assumptions could potentially introduce bias into parameter estimates and result in inaccurate outcomes. While attempts were made to address this by transforming some predictors using logarithmic transformations, certain predictors still contain significant zero values, so they were retained in their original form. Additionally, some predictors are interrelated with each other; for instance, the percentage of residents with at least a bachelor's degree is negatively correlated with the poverty status. Furthermore, an examination of the residuals map reveals the presence of spatial autocorrelation, which could lead to inefficient parameter estimates. As such, addressing nonlinear relationships, correlated observations, and spatial autocorrelation is crucial when modeling this data.
  
 Also, for out NBELPOV100 variable, we use raw numbers instead of percentage, which might make it difficult to compare across different geographical regions or time periods, as it lacks contexts or normalization. And this may further lead to misleading interpretations of the predictor's effect. On the other hand, it's also challenging to explain the practical implications of changes in the number of households in poverty without considering the total population or percentage of poverty.
 
 
-## Explain the methods - Hang
-d)	Would it make sense to run Ridge or LASSO regression here? Explain briefly (~4-5 sentences) what these methods are, when they’re used, and why they would or would not be appropriate here.
+## Ridge and LASSO Regression
+
+Ridge and LASSO regression are alternative regression techniques similar to each other that allow for multicollinearity, allow for larger number of predictors than observations, and deal with overfitting by shrinking the coefficient of variables to 0. However, both Ridge and LASSO regression will result in biased predicted values while the variance become lower, and they will increase the complexity of the model and the way of interpretation. The problem of Ridge regression is that all k predictors will be included, that is, it cannot perform variable selection. LASSO regression on the other hand can do variable selection, but still has other limitations. Normally, ridge/LASSO regression will be applied when there are severe multicollinearity, few observations relative to the number of predictors, or we would like a beter fit for unseen data than with OLS regression. In this case, as our model does not have the problem of multicollinearity and our number of observations are larger than number of predictors, we assume that it is unnecessary to perform those two regression methods here in this situation. 
+
+
+# **References**
+Economy League. (2023). Philadelphia’s Housing Cost-burden: A Pre- and Post-Pandemic Comparison. https://www.economyleague.org/resources/philadelphias-housing-cost-burden-pre-and-post-pandemic-comparison 
